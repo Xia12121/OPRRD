@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "oprrd"
+version = "0.1.0"
+description = "OP-RRD: On-Policy Relational Representation Distillation (cross-architecture)"
+requires-python = ">=3.10"
+
+[tool.setuptools]
+packages = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::FutureWarning",
+]
+markers = [
+    "gpu: tests that require a CUDA device",
+    "slow: tests that download models or run training",
+]

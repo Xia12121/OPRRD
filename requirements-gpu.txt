@@ -1,0 +1,8 @@
+# Extra deps for the GPU training/eval run (install on the GPU node, after the
+# CUDA build of torch is in place). Pin exact versions at run time and record
+# them in the paper's reproducibility appendix.
+bitsandbytes>=0.43      # 8-bit teacher load
+vllm>=0.5               # optional: faster rollout generation
+lm-eval>=0.4            # optional: standardized eval harness cross-check
+# ULD / DSKD are run from their OFFICIAL repositories (record commit hashes);
+# do not re-implement them here (IMPLEMENTATION_SPEC Task E).

@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+outputs/
+*.egg-info/
+.DS_Store
+*.log
+# model / data caches
+hf_cache/
+*.safetensors
+# trained adapters
+adapter/

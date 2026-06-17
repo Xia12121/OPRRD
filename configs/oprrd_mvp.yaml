@@ -1,0 +1,56 @@
+# OP-RRD MVP config (IMPLEMENTATION_SPEC §3).
+# Defaults are the method's v1 defaults; ablation alternatives noted inline.
+
+seed: 17
+output_dir: outputs/mvp
+
+model:
+  teacher: "meta-llama/Llama-3.1-8B-Instruct"
+  student: "Qwen/Qwen2.5-1.5B-Instruct"
+  teacher_load_in_8bit: true
+  lora_r: 16
+  lora_alpha: 32
+  lora_dropout: 0.0
+  lora_target_modules: ["q_proj", "k_proj", "v_proj", "o_proj"]
+
+relational:
+  operator: "cka"                        # ablation: "cosine_frobenius"
+  layer_pairs_rel_depth: [0.5, 0.667]    # middle layers; ablation: [1.0], [0.25,0.5,0.75,1.0]
+  K_spans: 16
+  K_min: 4                               # skip a sample's L_rel if < K_min valid spans
+  span_strategy: "last_k"                # ablation: "uniform", "reasoning_step", "all"
+  lambda_rel: 0.05                       # sweep: [0.01, 0.05, 0.1, 0.3] -- do NOT set large
+  on_policy: true                        # main claim 3: false = off-policy ablation
+  rollout_temperature: 0.7
+  max_new_tokens: 256
+  max_length: 1024
+
+training:
+  learning_rate: 1.0e-4
+  per_device_batch_size: 2
+  gradient_accumulation_steps: 8
+  max_steps: 500
+  warmup_ratio: 0.1
+  scheduler: "cosine"
+  max_grad_norm: 1.0
+  eval_every_n_steps: 100
+
+kill:
+  rel_window: 150                        # mean_cka must rise within this many steps
+  max_runtime_s: 86400                   # 24h single-run budget
+  max_total_loss: 50.0
+
+data:
+  rel_task: "gsm8k"                      # rollout prompts source
+  sft_task: "gsm8k"                      # CE branch (question + gold solution)
+  train_split: "train"
+  train_subset: 2000                     # MVP: GSM8K train subset ~2k
+  eval_task: "gsm8k"
+  eval_split: "test"
+  eval_samples: 200
+
+eval:
+  tasks: ["gsm8k", "math", "arc_challenge", "boolq"]
+  eval_samples: 200
+  k_shot: 4
+  max_new_tokens: 512
